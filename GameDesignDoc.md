@@ -18,17 +18,20 @@ This bear, representing UCLA, will run from the right side of the screen towards
 #####Stanford Tree
 This tree, representing Stanford's mascot, will appear to pace back and forth once it appears in Tommy's path. It is Tommy's job to avoid
 it by jumping over.
-![alt text] (Tree.jpg "Tommy Trojan")
+
+![alt text] (Tree.jpg "Tree")
 
 #####Arizone Sun Devil
 This devil, once it appears, remains stationary but, it shoots fire balls at Tommy.
   * **Fireballs** originate from the Sun Devil and move in a straight line towards Tommy.
-![alt text] (SunDevil.gif "Tommy Trojan")
+  
+![alt text] (SunDevil.gif "Sun Devil")
   
 #####DPS Officers
 DPS originates at the left side of the screen. Since they are riding Segways, and are clearly superior, it is Tommy's job to
 jump vertically out of the way as they approach him from behind.
-![alt text] (DPS_Segway.jpg "Tommy Trojan")
+
+![alt text] (DPS_Segway.jpg "DPS")
 
 
 #####Books
