@@ -1,5 +1,5 @@
 ## Tommy Saves The Day
-This game follows Tommy Trojan as he tries to get to class before the time runs out. On his way to class he must avoid the viscious Bruins, 
+This game follows Tommy Trojan as he tries to get to class, running through campus. On his way to class he must avoid the viscious Bruins, 
 the overly-caffinated Stanford Trees, angry Sun Devils, construction obstacles and DPS officers that dont move for anyone.
 
 ----
