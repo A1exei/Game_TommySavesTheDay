@@ -1,25 +1,21 @@
 # Game - Programming Assignments Private Repository
 ### Student Information
-  + Name: Tommy Trojan
-  + USC Email: ttrojan@usc.edu
-  + USC ID: 0123456789
-
-### Game Information
-  + Game Name: myAwsomeGame
-  + Game Description: One sentence game description
-  + [Game Design Doc](GameDesignDoc.md)
-
+  + Name: Alexei Naumann
+  + USC Email: anaumann@usc.edu
+  + USC ID: 9046815394
 
 ### Compile & Run Instructions
 The grader should use the following procedure to compile and run the code:
 ```shell
 #Compile Instructions
-echo "Write command here"
+
 #Doxygen Instructions
-echo "Write command here"
+
 #Command to run
-echo "Write command here"
+
 ```
 
-### Screenshots -- [Optional]
-You can either remove this section or add screenshots if you wish.
+### Other Repositories:
+You can find the code for older PAs here:
+  + [Social Network](https://github.com/usc-csci102-spring2013/programming_assignments/tree/social_network)
+  + [puzzle](https://github.com/usc-csci102-spring2013/programming_assignments/tree/puzzle)

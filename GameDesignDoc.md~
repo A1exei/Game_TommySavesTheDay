@@ -59,5 +59,4 @@ Tommy Trojan (the main character) will remain stationary in the middle of the sc
 officer, when he appears, starts from the left and goes right. The game options and status (i.e. Score, Lives, Stop, Start...etc) will be on
 a toolbar at the top of the screen. The Stop and Start will be PushButtons, the Health indicator a QListWidget and the score a QLabel. The 
 spacebar will be the only key used during gameplay, with the exception of the "esc" key which will exit the game at any time.
-![alt text] (GameView.png "Tommy Trojan")
 
