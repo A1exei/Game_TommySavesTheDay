@@ -9,11 +9,11 @@ the overly-caffinated Stanford Trees, angry Sun Devils, construction obstacles a
 This object is an image of Tommy Trojan riding Traveler the horse. Since he is the game's main character, he will remain fixed in the 
 middle of the screen. The appearance of the horse's movement will be simulated with the use of addittional images that have its legs
 in different running positions. The character itself has no power and all he can do is avoid objects as they come at him by jumping.
-![alt text] (Pic1.jpg "Tommy Trojan")
+![alt text] (Images/HORSE.png "Tommy Trojan")
 
 #####Bruin Bear
 This bear, representing UCLA, will run from the right side of the screen towards Tommy. If Tommy hits it, he will lose health.
-![alt text] (Bear.gif "Bruin")
+![alt text] (Images/BEAR_1.png "Bruin")
 
 #####Stanford Tree
 This tree, representing Stanford's mascot, will appear to pace back and forth once it appears in Tommy's path. It is Tommy's job to avoid
