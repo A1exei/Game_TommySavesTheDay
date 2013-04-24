@@ -9,6 +9,10 @@ Tommy::Tommy()
     label = new QLabel(this);
     label->setPixmap(scaled);
 
+    label->setAutoFillBackground(true);
+    QPalette pal = label->palette();
+    pal.setColor(QPalette::Window, QColor(Qt::white));
+    label->setPalette(pal);
 
     timer = new QTimer(this);
     timer->setInterval(400);

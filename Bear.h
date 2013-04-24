@@ -11,12 +11,12 @@ class Bear : public GameObject
 public:
     Bear();
     ~Bear();
-    QPixmap* pic;
-    QPixmap* pic2;
-    QPixmap scaled;
-    QPixmap scaled2;
-    QLabel* label;
-    QTimer* timer;
+    QPixmap* BearPic;
+    QPixmap* BearPic2;
+    QPixmap BearScaled;
+    QPixmap BearScaled2;
+    QLabel* BearLabel;
+    QTimer* BearTimer;
     bool moving;
 
 

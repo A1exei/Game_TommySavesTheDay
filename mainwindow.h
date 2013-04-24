@@ -16,6 +16,7 @@
 #include <QtCore>
 #include <QFont>
 #include <QLabel>
+#include <QProgressBar>
 #include <QListView>
 #include <iostream>
 #include <vector>
@@ -39,6 +40,9 @@ public:
    QLabel* ScoreLabel;
    QLabel* Score;
    QLabel* Health;
+   QProgressBar* HealthBar;
+   QPushButton* Start;
+   QPushButton* Quit;
    Tommy* tommy;
    Bear* bear;
    QTimer* timer;
@@ -50,7 +54,11 @@ private:
     QGraphicsView *MainView;
     QGraphicsView *GameView;
 
+protected:
+    void keyPressEvent(QKeyEvent *event);
+
 private slots:
+    void start();
     void exit();
     void objectAnimate();
 

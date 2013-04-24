@@ -2,23 +2,23 @@
 
 Bear::Bear()
 {
-    pic = new QPixmap("Images/BEAR_1.png");
-    pic2 = new QPixmap("Images/BEAR_2.png");
-    scaled = pic->scaled( 150, 150, Qt::IgnoreAspectRatio, Qt::FastTransformation );
-    scaled2 = pic2->scaled( 150, 150, Qt::IgnoreAspectRatio, Qt::FastTransformation );
-    label = new QLabel(this);
-    label->setPixmap(scaled);
+    BearPic = new QPixmap("Images/BEAR_1.png");
+    BearPic2 = new QPixmap("Images/BEAR_2.png");
+    BearScaled = BearPic->scaled( 150, 150, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+    BearScaled2 = BearPic2->scaled( 150, 150, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+    BearLabel = new QLabel(this);
+    BearLabel->setPixmap(BearScaled);
 
-    label->setAutoFillBackground(true);
-    QPalette pal = label->palette();
+    BearLabel->setAutoFillBackground(true);
+    QPalette pal = BearLabel->palette();
     pal.setColor(QPalette::Window, QColor(Qt::white));
-    label->setPalette(pal);
+    BearLabel->setPalette(pal);
 
-    timer = new QTimer(this);
-    timer->setInterval(400);
-    timer->start();
+    BearTimer = new QTimer(this);
+    BearTimer->setInterval(400);
+    BearTimer->start();
 
-    connect(timer, SIGNAL(timeout()), this, SLOT( movement() ) );
+    connect(BearTimer, SIGNAL(timeout()), this, SLOT( movement() ) );
 
 }
 
@@ -26,12 +26,12 @@ void Bear::movement()
 {
     if (moving == true)
     {
-        label->setPixmap(scaled);
+         BearLabel->setPixmap(BearScaled);
          moving = false;
     }
     else
     {
-        label->setPixmap(scaled2);
+        BearLabel->setPixmap(BearScaled2);
         moving = true;
     }
 }
