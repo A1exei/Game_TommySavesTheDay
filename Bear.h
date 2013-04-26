@@ -7,21 +7,15 @@ using namespace std;
 
 class Bear : public GameObject
 {
-    Q_OBJECT
-public:
-    Bear();
-    ~Bear();
-    QPixmap* BearPic;
-    QPixmap* BearPic2;
-    QPixmap BearScaled;
-    QPixmap BearScaled2;
-    QLabel* BearLabel;
-    QTimer* BearTimer;
-    bool moving;
+
+    public:
+        Bear();
+        ~Bear();
+        
+        bool moving;
+        int GIFcounter;
 
 
-public slots:
-    void movement();
 };
 
 #endif // BEAR_H

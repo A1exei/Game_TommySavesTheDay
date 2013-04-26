@@ -1,23 +1,17 @@
 #include "mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
+MainWindow::MainWindow() 
 {
-    this->setFocus();
-    this->setFocusPolicy(Qt::StrongFocus);
-    scene = new QGraphicsScene;
-    MainView = new QGraphicsView(scene);
-    GameScene  = new QGraphicsScene();
+
+    Layout = new QVBoxLayout;
+    GameScene = new QGraphicsScene();
+    GameScene->setSceneRect(0,0,850,500);
+   
     GameView = new QGraphicsView(GameScene);
-    GameScene->setSceneRect(20,20, 600, 400);
 
-    MainView->setWindowTitle( "Tommy Saves The Day");
-    MainView->setFixedSize( 700, 500 );
-    Layout = new QVBoxLayout();
-    ToolBar = new QToolBar("Tommy Saves the Day");
+    ToolBar = new QToolBar();
     Layout->addWidget(ToolBar);
-    MainView->setLayout(Layout);
-
+    
     ScoreLabel = new QLabel("Score: ");
     ToolBar->addWidget(ScoreLabel);
 
@@ -46,41 +40,64 @@ MainWindow::MainWindow(QWidget *parent) :
 
     Layout->addWidget(GameView);
 
+
     tommy  = new Tommy();
     bear = new Bear();
 
-    GameScene->addWidget(bear);
-    GameScene->addWidget(tommy);
-    tommy->move(0,300);
-    bear->move(300,250);
+    GameScene->addItem(bear);
+    GameScene->addItem(tommy);
+
+    tommy->setPos(400,350);
+    bear->setPos(700,400);
 
     timer  = new QTimer(this);
-    timer->setInterval(15);
-    timer->start();
+    timer->setInterval(10);
+
+
+    setFocus();
+    setLayout(Layout);
+
+    HorsePic = new QPixmap("Images/HORSE.png");
+    HorsePic2 = new QPixmap("Images/HORSE_2.png");
+    HorseScaled  = HorsePic->scaled( 150, 150, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+    HorseScaled2 = HorsePic2->scaled( 150, 150, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+    
+    BearPic = new QPixmap("Images/BEAR_1.png");
+    BearPic2 = new QPixmap("Images/BEAR_2.png");
+    BearScaled = BearPic->scaled( 100, 100, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+    BearScaled2 = BearPic2->scaled( 100, 100, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+
 
     connect(Start, SIGNAL(clicked()), this, SLOT( start() ));
     connect(Quit, SIGNAL(clicked()), this, SLOT( exit() ));
+    connect(timer, SIGNAL(timeout()), this, SLOT( imageRotate() ));
     connect(timer, SIGNAL(timeout()), this, SLOT( objectAnimate() ));
-
-
-
 }
 
 
 void MainWindow::start()
 {
 
+    timer->start();
+    tommy->setPixmap(HorseScaled);
+    bear->setPixmap(BearScaled);
+
 }
 
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    //cout<<"Test";
+
     switch(event->key())
     {
         case Qt::Key_Space:
-            cout<<"Space!"<<endl;
+            {
+               cout<<"Test"<<endl;
+            }
             break;
+
+        default:
+            QWidget::keyPressEvent(event);
 
     }
 
@@ -89,21 +106,65 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 void MainWindow::objectAnimate()
 {
-    //int Tx = tommy->x();
-   // int Ty = tommy->y();
-   // tommy->move(0,0);
+        int Bx = bear->x();
+        if (Bx > -120)
+        bear->moveBy(-1, 0);
 
-    int Bx = bear->x();
-    int By = bear->y();
-    if (Bx < -170)
-        bear->move(700,250);
-    else
-        bear->move(Bx-1,By);
 }
 
-void MainWindow::show()
+
+void MainWindow::imageRotate()
 {
-    MainView->show();
+
+    if (tommy->GIFcounter%30 == 0)
+    {
+        if (tommy->moving == true)
+        {
+             tommy->setPixmap(HorseScaled);
+             tommy->moving = false;
+             tommy->GIFcounter = 0;
+        }
+        else
+        {
+            tommy->setPixmap(HorseScaled2);
+            tommy->moving = true;
+            tommy->GIFcounter = 0;
+        }
+
+
+    }
+    tommy->GIFcounter++;
+
+    /////////////////////////////////////////////////////////
+    if (bear->GIFcounter%35 == 0)
+    {
+        if (bear->moving == true)
+        {
+             bear->setPixmap(BearScaled);
+             bear->moving = false;
+             bear->GIFcounter = 0;
+        }
+        else
+        {
+            bear->setPixmap(BearScaled2);
+            bear->moving = true;
+            bear->GIFcounter = 0;
+        }
+
+
+    }
+    bear->GIFcounter++;
+    
+
+    ///////////////////////////////////////////////////////
+    
+    
+}
+
+void MainWindow::tommyJump()
+{
+
+
 }
 
 void MainWindow::exit()

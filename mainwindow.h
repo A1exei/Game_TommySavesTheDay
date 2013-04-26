@@ -21,38 +21,45 @@
 #include <iostream>
 #include <vector>
 #include <cstdlib>
+#include "GameObject.h"
 #include "Tommy.h"
 #include "Bear.h"
 
 using namespace std;
 
 
-class MainWindow : public QMainWindow
+class MainWindow : public QWidget
 {
     Q_OBJECT
     
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    MainWindow();
     ~MainWindow();
-    void show();
-   QToolBar* ToolBar;
-   QVBoxLayout* Layout;
-   QLabel* ScoreLabel;
-   QLabel* Score;
-   QLabel* Health;
-   QProgressBar* HealthBar;
-   QPushButton* Start;
-   QPushButton* Quit;
-   Tommy* tommy;
-   Bear* bear;
-   QTimer* timer;
-
-
+   
 private:
-    QGraphicsScene *scene;
+    QToolBar* ToolBar;
     QGraphicsScene *GameScene;
-    QGraphicsView *MainView;
     QGraphicsView *GameView;
+    QVBoxLayout* Layout;
+    QLabel* ScoreLabel;
+    QLabel* Score;
+    QLabel* Health;
+    QProgressBar* HealthBar;
+    QPushButton* Start;
+    QPushButton* Quit;
+    QTimer* timer;
+
+    Tommy* tommy;
+    QPixmap* HorsePic;
+    QPixmap* HorsePic2;
+    QPixmap HorseScaled;
+    QPixmap HorseScaled2;
+    
+    Bear* bear;
+    QPixmap* BearPic;
+    QPixmap* BearPic2;
+    QPixmap BearScaled;
+    QPixmap BearScaled2;
 
 protected:
     void keyPressEvent(QKeyEvent *event);
@@ -61,6 +68,8 @@ private slots:
     void start();
     void exit();
     void objectAnimate();
+    void imageRotate();
+    void tommyJump();
 
 };
 
