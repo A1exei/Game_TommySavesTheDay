@@ -24,6 +24,7 @@
 #include "GameObject.h"
 #include "Tommy.h"
 #include "Bear.h"
+#include "Backdrop.h"
 
 using namespace std;
 
@@ -60,6 +61,11 @@ private:
     QPixmap* BearPic2;
     QPixmap BearScaled;
     QPixmap BearScaled2;
+
+    Backdrop* Background;
+    Backdrop* Background2;
+    bool moveBackground2;
+    
 
 protected:
     void keyPressEvent(QKeyEvent *event);
