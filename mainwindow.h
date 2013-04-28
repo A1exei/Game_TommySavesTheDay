@@ -25,6 +25,12 @@
 #include "Tommy.h"
 #include "Bear.h"
 #include "Backdrop.h"
+#include "DPS.h"
+#include "Tree.h"
+#include "Devil.h"
+#include "Fireball.h"
+#include "Duck.h"
+#include "Book.h"
 
 using namespace std;
 
@@ -47,8 +53,13 @@ private:
     QLabel* Health;
     QProgressBar* HealthBar;
     QPushButton* Start;
+    QPushButton* Pause;
     QPushButton* Quit;
     QTimer* timer;
+
+    Backdrop* Background;
+    Backdrop* Background2;
+    bool moveBackground2;
 
     Tommy* tommy;
     QPixmap* HorsePic;
@@ -62,20 +73,60 @@ private:
     QPixmap BearScaled;
     QPixmap BearScaled2;
 
-    Backdrop* Background;
-    Backdrop* Background2;
-    bool moveBackground2;
-    
+    DPS* dps;
+    QPixmap* DPSpic1;
+    QPixmap* DPSpic2;
+    QPixmap DPSscaled1;
+    QPixmap DPSscaled2;
+
+    Tree* tree;
+    QPixmap* TreePic1;
+    QPixmap* TreePic2;
+    QPixmap TreeScaled1;
+    QPixmap TreeScaled2;
+    int treeCounter;
+    int jumpCounter;
+    QTimer* treeTimer;
+
+    Devil* devil;
+    QPixmap* DevilPic;
+    QPixmap* DevilPic2;
+    QPixmap DevilScaled;
+    QPixmap DevilScaled2;
+
+    Fireball* fireball;
+    QPixmap* FireballPic;
+    QPixmap* FireballPic2;
+    QPixmap FireballScaled;
+    QPixmap FireballScaled2;
+
+    Duck* duck;
+    QPixmap* DuckPic;
+    QPixmap DuckScaled;
+    int DUCK_Y;
+
+    Book* book;
+    QPixmap* BookPic;
+    QPixmap* BookPic2;
+    QPixmap BookScaled;
+    QPixmap BookScaled2;
+
+
 
 protected:
     void keyPressEvent(QKeyEvent *event);
 
 private slots:
     void start();
+    void pause();
     void exit();
     void objectAnimate();
+    void fireballShoot();
+    void bookDrop();
     void imageRotate();
+    void jumpRegulator();
     void tommyJump();
+
 
 };
 
