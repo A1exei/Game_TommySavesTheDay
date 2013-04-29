@@ -21,6 +21,8 @@
 #include <iostream>
 #include <vector>
 #include <cstdlib>
+#include <stdlib.h>
+#include <stdio.h>
 #include "GameObject.h"
 #include "Tommy.h"
 #include "Bear.h"
@@ -66,50 +68,80 @@ private:
     QPixmap* HorsePic2;
     QPixmap HorseScaled;
     QPixmap HorseScaled2;
+    QPixmap blank;
+    bool tommyJumping;
+    bool leftPosition;
     
     Bear* bear;
     QPixmap* BearPic;
     QPixmap* BearPic2;
     QPixmap BearScaled;
     QPixmap BearScaled2;
+    bool bearExists;
 
     DPS* dps;
     QPixmap* DPSpic1;
     QPixmap* DPSpic2;
     QPixmap DPSscaled1;
     QPixmap DPSscaled2;
+    bool DPSexists;
 
     Tree* tree;
     QPixmap* TreePic1;
     QPixmap* TreePic2;
     QPixmap TreeScaled1;
     QPixmap TreeScaled2;
-    int treeCounter;
-    int jumpCounter;
-    QTimer* treeTimer;
+    int treeJumpCounter;
+    bool treeIsJumping;
+    bool treeIsFalling;
+    bool treeExists;
 
     Devil* devil;
     QPixmap* DevilPic;
     QPixmap* DevilPic2;
     QPixmap DevilScaled;
     QPixmap DevilScaled2;
+    bool shootFireball;
+    bool devilExists;
 
     Fireball* fireball;
     QPixmap* FireballPic;
     QPixmap* FireballPic2;
     QPixmap FireballScaled;
     QPixmap FireballScaled2;
+    bool fireballExists;
 
     Duck* duck;
     QPixmap* DuckPic;
     QPixmap DuckScaled;
     int DUCK_Y;
+    bool duckExists;
+    bool dropBook;
 
     Book* book;
     QPixmap* BookPic;
     QPixmap* BookPic2;
     QPixmap BookScaled;
     QPixmap BookScaled2;
+    bool bookExists;
+
+
+    vector<GameObject*> GameObjects;
+    int BearCounter;
+    int bearStartX;
+    int numBears;
+    int MAX_BEARS;
+
+    int DPScounter;
+    int DPSlimit;
+
+    int treeCounter;
+    int treeStartX;
+
+    int devilCounter;
+
+    int duckCounter;
+
 
 
 
@@ -126,7 +158,8 @@ private slots:
     void imageRotate();
     void jumpRegulator();
     void tommyJump();
-
+    void tommyCollision();
+    void addItems();
 
 };
 

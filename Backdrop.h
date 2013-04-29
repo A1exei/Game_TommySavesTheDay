@@ -12,6 +12,8 @@ class Backdrop : public GameObject
         ~Backdrop();
         QPixmap* BackgroundPic;
         QPixmap BackgroundScaled;
+        int ObjectType();
+        int type_;
 
 };
 

@@ -12,6 +12,8 @@ public:
     ~Fireball();
     bool moving;
     int GIFcounter;
+    int type_;
+    int ObjectType();
 
 };
 

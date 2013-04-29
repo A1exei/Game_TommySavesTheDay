@@ -4,8 +4,13 @@ Devil::Devil()
 {
 
     GIFcounter = 0;
-    shootFireball = false;
+    type_ = 4;
 
+}
+
+int Devil::ObjectType()
+{
+    return type_;
 }
 
 Devil::~Devil()

@@ -10,10 +10,11 @@ class Bear : public GameObject
 
     public:
         Bear();
-        ~Bear();
-        
+        ~Bear();  
         bool moving;
         int GIFcounter;
+        int type_;
+        int ObjectType();
 
 
 };

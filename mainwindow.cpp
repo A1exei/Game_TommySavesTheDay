@@ -1,17 +1,17 @@
 #include "mainwindow.h"
 
-MainWindow::MainWindow() 
+MainWindow::MainWindow()
 {
 
     Layout = new QVBoxLayout;
     GameScene = new QGraphicsScene();
     GameScene->setSceneRect(0,0,850,500);
-   
+
     GameView = new QGraphicsView(GameScene);
 
     ToolBar = new QToolBar();
 
-    
+
     ScoreLabel = new QLabel("Score: ");
     ToolBar->addWidget(ScoreLabel);
 
@@ -65,35 +65,35 @@ MainWindow::MainWindow()
     HorsePic2 = new QPixmap("Images/HORSE_2.png");
     HorseScaled  = HorsePic->scaled( 150, 150, Qt::IgnoreAspectRatio, Qt::FastTransformation );
     HorseScaled2 = HorsePic2->scaled( 150, 150, Qt::IgnoreAspectRatio, Qt::FastTransformation );
-
+    leftPosition = false;
     GameScene->addItem(tommy);
     tommy->setPos(400,350);
-    
-    bear = new Bear();
-    BearPic = new QPixmap("Images/BEAR_1.png");
-    BearPic2 = new QPixmap("Images/BEAR_2.png");
-    BearScaled = BearPic->scaled( 80, 80, Qt::IgnoreAspectRatio, Qt::FastTransformation );
-    BearScaled2 = BearPic2->scaled( 80, 80, Qt::IgnoreAspectRatio, Qt::FastTransformation );
-    GameScene->addItem(bear);
-    bear->setPos(700,410);
 
-    dps = new DPS();
-    DPSpic1 = new QPixmap("Images/DPS_1.png");
-    DPSpic2 = new QPixmap("Images/DPS_3.png");
-    DPSscaled1 = DPSpic1->scaled( 90, 150, Qt::IgnoreAspectRatio, Qt::FastTransformation );
-    DPSscaled2 = DPSpic2->scaled( 90, 150, Qt::IgnoreAspectRatio, Qt::FastTransformation );
-    GameScene->addItem(dps);
-    dps->setPos(-200,400);
+    bearExists = false;
+    BearCounter = 0;
+    numBears = 0;
+    MAX_BEARS = 3;
 
-    tree = new Tree();
-    TreePic1 = new QPixmap("Images/TREE_1.png");
-    TreePic2 = new QPixmap("Images/TREE_2.png");
-    TreeScaled1 = TreePic1->scaled( 80, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation );
-    TreeScaled2 = TreePic2->scaled( 80, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation );
-    GameScene->addItem(tree);
-    tree->setPos(900,410);
-    tree->isJumping = true;
+    srand( time(NULL));
+    bearStartX = rand()%800 + 800;
 
+    DPSexists = false;
+    DPSlimit = 40;
+    DPScounter = 0;
+
+    treeExists = false;
+    treeCounter = 0;
+
+    devilExists  = false;
+    devilCounter = 0;
+
+    fireballExists = false;
+
+    duckExists = false;
+    duckCounter = 0;
+
+    bookExists = false;
+    /*
     devil = new Devil();
     DevilPic = new QPixmap("Images/DEVIL_1.png");
     DevilPic2 = new QPixmap("Images/DEVIL_2.png");
@@ -123,7 +123,8 @@ MainWindow::MainWindow()
     BookPic2 = new QPixmap("Images/POOP_2.png");
     BookScaled2 = BookPic2->scaled( 40, 40, Qt::IgnoreAspectRatio, Qt::FastTransformation );
     GameScene->addItem(book);
-    book->setPos(200, DUCK_Y);
+    book->setPos(200, DUCK_Y);    */
+
 
 
     connect(Start, SIGNAL(clicked()), this, SLOT( start() ));
@@ -135,7 +136,8 @@ MainWindow::MainWindow()
     connect(timer, SIGNAL(timeout()), this, SLOT( tommyJump() ));
     connect(timer, SIGNAL(timeout()), this, SLOT( fireballShoot() ));
     connect(timer, SIGNAL(timeout()), this, SLOT( bookDrop() ));
-
+    connect(timer, SIGNAL(timeout()), this, SLOT( tommyCollision() ));
+    connect(timer, SIGNAL(timeout()), this, SLOT( addItems() ));
     setFocus();
 
 }
@@ -145,10 +147,6 @@ void MainWindow::start()
 {
     timer->start();
     tommy->setPixmap(HorseScaled);
-    bear->setPixmap(BearScaled);
-    dps->setPixmap(DPSscaled1);
-    devil->setPixmap(DevilScaled);
-    duck->setPixmap(DuckScaled);
     setFocus();
 
 
@@ -170,10 +168,31 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             break;
 
        case Qt::Key_Left:
-        {
+            {
+                    if (tommy->jumpCounter == -1 || tommy->jumpCounter == 0)
+                    {
+                        if (tommy->x() > 380)
+                        {
+                            leftPosition = true;
+                            tommy->moveBy(-60, 0);
+                        }
+                    }
 
-        }
-        break;
+            }
+            break;
+
+        case Qt::Key_Right:
+         {
+                    if (tommy->jumpCounter == -1 || tommy->jumpCounter == 0)
+                    {
+                        if (tommy->x() < 400)
+                        {
+                            leftPosition = false;
+                            tommy->moveBy(60, 0);
+                        }
+                    }
+         }
+         break;
 
         default:
             QWidget::keyPressEvent(event);
@@ -184,14 +203,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 void MainWindow::objectAnimate()
 {
-        int Bx = bear->x();
-        if (Bx > -120)
-        bear->moveBy(-1.5, 0);
-        if (Bx == -120)
-        {
-            bear->setPos(900,410);
-        }
-//////////////////////////////////////////////////////
 
         int BackX = Background->x();
         int Back2X = Background2->x();
@@ -211,81 +222,117 @@ void MainWindow::objectAnimate()
             Background->setPos(1200, -19);
         }
 
-///////////////////////////////////////////////////
+ ////////////////////////////////////////////////
+    for (unsigned int i=0; i<GameObjects.size(); i++)
+    {
 
-        int DPSx = dps->x();
-        if (DPSx < 40)
-        dps->moveBy(.25, 0);
+        if( (GameObjects[i]->ObjectType() == 1 ) && ( bearExists==true ) )     // Bear Movement
+        {
+            int Bx = GameObjects[i]->x();
+            if (Bx > -120)
+                GameObjects[i]->moveBy(-.75, 0);
 
-//////////////////////////////////////////////////
-
-        int TreeX = tree->x();
-        int TreeY = tree->y();
-        //cout<<TreeX<<endl;
-        if(tree->isJumping)
+            if (Bx == -120)
             {
-                tree->moveBy(-2,-2);
-                tree->jumpCounter++;
-
-                if (tree->jumpCounter == 200)
-                {
-                    tree->isJumping = false;
-                    tree->isFalling = true;
-                }
+                GameObjects[i]->setPos(1800,410);
             }
+         }
+         ///////////////////////////////////////////                       // DPS movement
 
-            if (tree->isFalling)
-            {
-                tree->moveBy(-2,2);
-                tree->jumpCounter++;
+        if( (GameObjects[i]->ObjectType() == 2 ) && ( DPSexists == true ) )
+        {
+            int DPSx = GameObjects[i]->x();
+            if (DPSx < DPSlimit)
+                GameObjects[i]->moveBy(.25, 0);
+        }
 
-                if (tree->jumpCounter == 400)
-                {
-                    tree->isJumping = false;
-                    tree->isFalling = false;
-                }
+        //////////////////////////////////////////                      // Tree movement
+
+        if( (GameObjects[i]->ObjectType() == 3 ) && ( treeExists == true ) )
+        {
+             int TreeX = GameObjects[i]->x();
+             //int TreeY = GameObjects[i]->y();
+            // cout<<TreeY<<endl;
+                if(treeIsJumping)
+                    {
+                        GameObjects[i]->moveBy(-1.5,-1.7);
+                        treeJumpCounter++;
+
+                        if (treeJumpCounter == 150)
+                        {
+                            treeIsJumping = false;
+                            treeIsFalling = true;
+                        }
+                    }
+
+                    if (treeIsFalling)
+                    {
+                        GameObjects[i]->moveBy(-1.5,1.7);
+                        treeJumpCounter++;
+
+                        if (treeJumpCounter == 300)
+                        {
+                            treeIsJumping = false;
+                            treeIsFalling = false;
+                        }
+                    }
+
+                    if ((treeIsJumping == false) && (treeIsFalling == false) )
+                    {
+                        treeIsJumping = true;
+                        treeJumpCounter = 0;
+                    }
+
+                    if (TreeX < -120 )
+                    {
+                        srand( time(NULL));
+                        treeStartX = rand()%900 + 900;
+                        //cout<<"Tree StartX: "<<treeStartX<<endl;
+
+                        GameObjects[i]->setPos(treeStartX, 410);
+                        treeIsJumping = true;
+                        treeIsFalling = false;
+                        treeJumpCounter = 0;
+                    }
             }
-
-            if ((tree->isJumping == false) && (tree->isFalling == false) )
-            {
-                tree->isJumping = true;
-                tree->jumpCounter = 0;
-            }
-
-            if (TreeX < -120 && TreeY == 410)
-            {
-                tree->setPos(1000, 410);
-            }
-///////////////////////////////////////////////////////////
-            if (devil->scene() == GameScene)
-            {
-                int Dx = devil->x();
+       ////////////////////////////////////////////////////
+       if( (GameObjects[i]->ObjectType() == 4 ) && ( devilExists == true ) )
+        {
+                int Dx = GameObjects[i]->x();
                 if (Dx > 650)
-                    devil->moveBy(-1, 0);
+                    GameObjects[i]->moveBy(-1, 0);
                 if (Dx == 650)
                 {
-                    devil->shootFireball = true;
+                    shootFireball = true;
+                    GameScene->addItem(fireball);
+                    fireball->setPos(600, 400);
                     fireball->setPixmap(FireballScaled);
-                    GameScene->removeItem(devil);
+                    GameObjects[i]->setPos(2000,410);
                 }
-            }
-//////////////////////////////////////////////////////////////
-            int DuckX = duck->x();
+         }
+       //////////////////////////////////////////////////////
+       if( (GameObjects[i]->ObjectType() == 6 ) && ( duckExists == true ) )
+        {
+            int DuckX = GameObjects[i]->x();
 
             if (DuckX > -500)
-                duck->moveBy(-2, 0);
+                GameObjects[i]->moveBy(-2, 0);
 
-            if (DuckX == 200)
+            if (DuckX == 400)
             {
-                duck->dropBook = true;
+                dropBook = true;
                 book->setPixmap(BookScaled);
+                GameScene->addItem(book);
+                book->setPos(400, DUCK_Y);
             }
 
             if (DuckX == -500)
             {
-                duck->setPos(1500,DUCK_Y);
+                GameObjects[i]->setPos(2300,DUCK_Y);
             }
+        }
 
+     }
 }
 
 
@@ -310,133 +357,155 @@ void MainWindow::imageRotate()
     tommy->GIFcounter++;
 
     /////////////////////////////////////////////////////////
-    if (bear->GIFcounter%42 == 0)
+    for (unsigned int i=0; i<GameObjects.size(); i++)
     {
-        if (bear->moving == true)
-        {
-             bear->setPixmap(BearScaled);
-             bear->moving = false;
-             bear->GIFcounter = 0;
-        }
-        else
-        {
-            bear->setPixmap(BearScaled2);
-            bear->moving = true;
-            bear->GIFcounter = 0;
-        }
-    }
-    bear->GIFcounter++;
-    
 
-    ///////////////////////////////////////////////////////
-    if (dps->GIFcounter%40 == 0)
-    {
-        if (dps->moving == true)
+        if( (GameObjects[i]->ObjectType() == 1 ) && ( bearExists==true ) )
         {
-             dps->setPixmap(DPSscaled1);
-             dps->moving = false;
-             dps->GIFcounter = 0;
-        }
-        else
-        {
-            dps->setPixmap(DPSscaled2);
-            dps->moving = true;
-            dps->GIFcounter = 0;
-        }
-    }
-    dps->GIFcounter++;
-   ///////////////////////////////////////////////////////
-   if (tree->GIFcounter%50 == 0)
-    {
-        if (tree->moving == true)
-        {
-             tree->setPixmap(TreeScaled1);
-             tree->moving = false;
-             tree->GIFcounter = 0;
-        }
-        else
-        {
-            tree->setPixmap(TreeScaled2);
-            tree->moving = true;
-            tree->GIFcounter = 0;
-        }
-    }
-    tree->GIFcounter++;
-//////////////////////////////////////////////////////
-    if (devil->GIFcounter%42 == 0)
-    {
-        if (devil->moving == true)
-        {
-             devil->setPixmap(DevilScaled);
-             devil->moving = false;
-             devil->GIFcounter = 0;
-        }
-        else
-        {
-            devil->setPixmap(DevilScaled2);
-            devil->moving = true;
-            devil->GIFcounter = 0;
-        }
-    }
-    devil->GIFcounter++;
+                    if (GameObjects[i]->GIFcounter%42 == 0)
+                    {
+                        if (GameObjects[i]->moving == true)
+                        {
+                             GameObjects[i]->setPixmap(BearScaled);
+                             GameObjects[i]->moving = false;
+                             GameObjects[i]->GIFcounter = 0;
+                        }
+                        else
+                        {
+                            GameObjects[i]->setPixmap(BearScaled2);
+                            GameObjects[i]->moving = true;
+                            GameObjects[i]->GIFcounter = 0;
+                        }
+                    }
+                    GameObjects[i]->GIFcounter++;
+         }
 
-//////////////////////////////////////////////////////
 
-    if (devil->shootFireball == true)
-    {
-        if (fireball->GIFcounter%30 == 0)
+            ///////////////////////////////////////////////////////
+        if( (GameObjects[i]->ObjectType() == 2 ) && ( DPSexists == true ) )
+        {
+           if (GameObjects[i]->GIFcounter%40 == 0)
             {
-                if (fireball->moving == true)
+                if (GameObjects[i]->moving == true)
                 {
-                     fireball->setPixmap(FireballScaled);
-                     fireball->moving = false;
-                     fireball->GIFcounter = 0;
+                     GameObjects[i]->setPixmap(DPSscaled1);
+                     GameObjects[i]->moving = false;
+                     GameObjects[i]->GIFcounter = 0;
                 }
                 else
                 {
-                    fireball->setPixmap(FireballScaled2);
-                    fireball->moving = true;
-                    fireball->GIFcounter = 0;
+                    GameObjects[i]->setPixmap(DPSscaled2);
+                    GameObjects[i]->moving = true;
+                    GameObjects[i]->GIFcounter = 0;
                 }
             }
-       fireball->GIFcounter++;
-    }
-    else if ((devil->shootFireball == false) && (fireball->scene() == GameScene) && (fireball->x() == 100))
-    {
-        GameScene->removeItem(fireball);
-    }
-////////////////////////////////////////////////////////////////
+            GameObjects[i]->GIFcounter++;
 
-    if (duck->dropBook == true)
-    {
-        if (book->GIFcounter%30 == 0)
+        }
+           ///////////////////////////////////////////////////////
+       if( (GameObjects[i]->ObjectType() == 3 ) && ( treeExists == true ) )
+        {
+           if (GameObjects[i]->GIFcounter%50 == 0)
             {
-                if (book->moving == true)
+                if (GameObjects[i]->moving == true)
                 {
-                     book->setPixmap(BookScaled);
-                     book->moving = false;
-                     book->GIFcounter = 0;
+                     GameObjects[i]->setPixmap(TreeScaled1);
+                     GameObjects[i]->moving = false;
+                     GameObjects[i]->GIFcounter = 0;
                 }
                 else
                 {
-                    book->setPixmap(BookScaled2);
-                    book->moving = true;
-                    book->GIFcounter = 0;
+                    GameObjects[i]->setPixmap(TreeScaled2);
+                    GameObjects[i]->moving = true;
+                    GameObjects[i]->GIFcounter = 0;
                 }
             }
-       book->GIFcounter++;
-    }
-    else if ((duck->dropBook == false) && (book->scene() == GameScene) && (book->y() == 450))
-    {
-        GameScene->removeItem(book);
-    }
+            GameObjects[i]->GIFcounter++;
+        }
+        //////////////////////////////////////////////////////
+       if( (GameObjects[i]->ObjectType() == 4 ) && ( devilExists == true ) )
+        {
+           if (GameObjects[i]->GIFcounter%42 == 0)
+            {
+                if (GameObjects[i]->moving == true)
+                {
+                     GameObjects[i]->setPixmap(DevilScaled);
+                     GameObjects[i]->moving = false;
+                     GameObjects[i]->GIFcounter = 0;
+                }
+                else
+                {
+                    GameObjects[i]->setPixmap(DevilScaled2);
+                    GameObjects[i]->moving = true;
+                    GameObjects[i]->GIFcounter = 0;
+                }
+            }
+            GameObjects[i]->GIFcounter++;
+        }
 
+        //////////////////////////////////////////////////////
+       if (fireballExists == true)
+       {
+            if (shootFireball == true)
+            {
+                if (fireball->GIFcounter%30 == 0)
+                    {
+                        if (fireball->moving == true)
+                        {
+                             fireball->setPixmap(FireballScaled);
+                             fireball->moving = false;
+                             fireball->GIFcounter = 0;
+                        }
+                        else
+                        {
+                            fireball->setPixmap(FireballScaled2);
+                            fireball->moving = true;
+                            fireball->GIFcounter = 0;
+                        }
+                    }
+               fireball->GIFcounter++;
+             }
+
+           /* else if ((shootFireball == false) && (fireballExists == true) && (fireball->x() == 100))
+            {
+                cout<<"Test"<<endl;
+                GameScene->removeItem(fireball);
+                fireballExists = false;
+            }                                       */
+        }
+        ////////////////////////////////////////////////////////////////
+       if (bookExists == true)
+       {
+            if (dropBook == true)
+            {
+                if (book->GIFcounter%30 == 0)
+                    {
+                        if (book->moving == true)
+                        {
+                             book->setPixmap(BookScaled);
+                             book->moving = false;
+                             book->GIFcounter = 0;
+                        }
+                        else
+                        {
+                            book->setPixmap(BookScaled2);
+                            book->moving = true;
+                            book->GIFcounter = 0;
+                        }
+                    }
+               book->GIFcounter++;
+            }
+            /*else if ((dropBook == false) && (book->scene() == GameScene) && (book->y() == 450))
+            {
+                GameScene->removeItem(book);
+            }     */
+       }
+    }
 }
 
 void MainWindow::jumpRegulator()
 {
 
-    //cout<<tommy->jumpCounter<<endl;
 
     if (tommy->jumpCounter > 0 &&  tommy->jumpCounter < 359)
         clearFocus();
@@ -456,13 +525,20 @@ void MainWindow::tommyJump()
             //cout<<tommy->jumpCounter<<endl;
             int Tx = tommy->x();
 
+
+            //cout<<tommy->y()<<endl;
+           // cout<<endl;
+
+
             if(tommy->isJumping)
             {
-                tommy->moveBy(.15,-1);
+                tommy->moveBy(.15,-1.2);
                 tommy->jumpCounter++;
+                //cout<<Tx<<endl;
 
                 if (tommy->jumpCounter == 150)
                 {
+                    //cout<<Tx<<endl;
                     tommy->isJumping = false;
                     tommy->isFalling = true;
                 }
@@ -470,46 +546,65 @@ void MainWindow::tommyJump()
 
             if (tommy->isFalling)
             {
-                tommy->moveBy(.15,1);
+                tommy->moveBy(.15,1.2);
                 tommy->jumpCounter++;
+                //cout<<Tx<<endl;
 
                 if (tommy->jumpCounter == 300)
                 {
+                    //cout<<Tx<<endl;
                     tommy->isJumping = false;
                     tommy->isFalling = false;
                 }
             }
 
-            if ( (tommy->isJumping == false) && (tommy->isFalling == false) && (Tx != 400))
+            if (leftPosition != true)
             {
-                tommy->moveBy(-.75,0);
-                tommy->jumpCounter++;
+                if ( (tommy->isJumping == false) && (tommy->isFalling == false) && (Tx != 400))
+                {
+                    tommy->moveBy(-.75,0);
+                    //cout<<Tx<<endl;
+                    tommy->jumpCounter++;
+                }
             }
 
+            if (leftPosition == true)
+            {
+                if ( (tommy->isJumping == false) && (tommy->isFalling == false) && (Tx != 340))
+                {
+
+                        tommy->moveBy(-.75,0);
+                        //cout<<Tx<<endl;
+                        tommy->jumpCounter++;
+                }
+            }
 }
+
 
 void MainWindow::fireballShoot()
 {
-    if (devil->shootFireball == true)
+
+    if (shootFireball == true && fireballExists == true)
     {
         int Fx = fireball->x();
         if (Fx > 100)
         {
             fireball->moveBy(-1.5, 0);
         }
-        if (Fx == 100 && (fireball->scene() == GameScene))
+        if (Fx == 100 && fireballExists == true && fireball->scene() == GameScene)
         {
-            //cout<<"Done"<<endl;
             GameScene->removeItem(fireball);
-            devil->shootFireball = false;
+            shootFireball = false;
         }
     }
+
+
 }
 
 
 void MainWindow::bookDrop()
 {
-    if (duck->dropBook == true)
+    if (dropBook == true && bookExists == true)
     {
         int BookY = book->y();
         if (BookY < 450)
@@ -519,11 +614,263 @@ void MainWindow::bookDrop()
         if (BookY == 450 && (book->scene() == GameScene))
         {
             GameScene->removeItem(book);
-            duck->dropBook = false;
+            dropBook = false;
         }
     }
+
 }
 
+
+void MainWindow::tommyCollision()
+{
+    for (unsigned int i=0; i<GameObjects.size(); i++)
+    {
+        if( (GameObjects[i]->ObjectType() == 1 ) && ( bearExists==true ) )
+        {
+            if (tommy->collidesWithItem(GameObjects[i]) )
+                {
+                    if (tommy->hurtCounter%10 == 0)
+                    {
+                        if (tommy->flashing == true)
+                        {
+                             tommy->setPixmap(HorseScaled);
+                             tommy->flashing = false;
+                             tommy->hurtCounter = 0;
+                        }
+                        else
+                        {
+                            tommy->setPixmap(blank);
+                            tommy->flashing = true;
+                            tommy->hurtCounter = 0;
+                        }
+
+                        if (tommy->hurtCounter%60 == 0)
+                        {
+                            int health = HealthBar->value();
+                            HealthBar->setValue(health - 1);
+                            tommy->hurtCounter = 0;
+                        }
+                    }
+                    tommy->hurtCounter++;
+                }
+         }
+        /////////////////////////
+        if( (GameObjects[i]->ObjectType() == 3 ) && ( treeExists==true ) )
+        {
+            if (tommy->collidesWithItem(GameObjects[i]) )
+                {
+                    if (tommy->hurtCounter%10 == 0)
+                    {
+                        if (tommy->flashing == true)
+                        {
+                             tommy->setPixmap(HorseScaled);
+                             tommy->flashing = false;
+                             tommy->hurtCounter = 0;
+                        }
+                        else
+                        {
+                            tommy->setPixmap(blank);
+                            tommy->flashing = true;
+                            tommy->hurtCounter = 0;
+                        }
+
+                        if (tommy->hurtCounter%40 == 0)
+                        {
+                            int health = HealthBar->value();
+                            HealthBar->setValue(health - 1);
+                            tommy->hurtCounter = 0;
+                        }
+                    }
+                    tommy->hurtCounter++;
+                }
+      }
+///////////////////////////////////////////////////////////////////////////
+            if (fireballExists == true && tommy->collidesWithItem(fireball) )
+                {
+                    if (tommy->hurtCounter%10 == 0)
+                    {
+                        if (tommy->flashing == true)
+                        {
+                             tommy->setPixmap(HorseScaled);
+                             tommy->flashing = false;
+                             tommy->hurtCounter = 0;
+                        }
+                        else
+                        {
+                            tommy->setPixmap(blank);
+                            tommy->flashing = true;
+                            tommy->hurtCounter = 0;
+                        }
+
+                        if (tommy->hurtCounter%30 == 0)
+                        {
+                            int health = HealthBar->value();
+                            HealthBar->setValue(health - 1);
+                            tommy->hurtCounter = 0;
+                        }
+                    }
+                    tommy->hurtCounter++;
+                }
+///////////////////////////////////////////////////////////////
+                if (bookExists == true && tommy->collidesWithItem(book) )
+                    {
+                        if (tommy->hurtCounter%50 == 0)
+                        {
+                            if (tommy->flashing == true)
+                            {
+                                 tommy->setPixmap(HorseScaled);
+                                 tommy->flashing = false;
+                                 tommy->hurtCounter = 0;
+                            }
+                            else
+                            {
+                                tommy->setPixmap(blank);
+                                tommy->flashing = true;
+                                tommy->hurtCounter = 0;
+                            }
+
+                            if (tommy->hurtCounter%80 == 0)
+                            {
+                                int health = HealthBar->value();
+                                HealthBar->setValue(health - 1);
+                                tommy->hurtCounter = 0;
+                            }
+                        }
+                        tommy->hurtCounter++;
+                    }
+
+}
+}
+
+
+void MainWindow::addItems()
+{
+    if (BearCounter % 2000 == 0 && numBears < MAX_BEARS+1)
+    {
+        bear = new Bear();
+        BearPic = new QPixmap("Images/BEAR_1.png");
+        BearPic2 = new QPixmap("Images/BEAR_2.png");
+        BearScaled = BearPic->scaled( 80, 80, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+        BearScaled2 = BearPic2->scaled( 80, 80, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+        bear->setPixmap(BearScaled);
+        GameScene->addItem(bear);
+        bear->setPos(bearStartX,410);
+
+        bearExists = true;
+        GameObjects.push_back(bear);
+        cout<<"Vector Size: "<<GameObjects.size()<<endl;
+        BearCounter = 0;
+        numBears++;
+    }
+    BearCounter++;
+
+///////////////////////////////////////////////////////////////
+    if (DPSexists == false)
+    {
+        DPScounter++;
+    }
+    if (DPScounter % 3000 == 0 && DPSexists == false)
+     {
+        dps = new DPS();
+        DPSpic1 = new QPixmap("Images/DPS_1.png");
+        DPSpic2 = new QPixmap("Images/DPS_3.png");
+        DPSscaled1 = DPSpic1->scaled( 90, 150, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+        DPSscaled2 = DPSpic2->scaled( 90, 150, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+        dps->setPixmap(DPSscaled1);
+        GameScene->addItem(dps);
+        dps->setPos(-200,400);
+
+        DPSexists = true;
+        GameObjects.push_back(dps);
+        cout<<"Vector Size: "<<GameObjects.size()<<endl;
+     }
+/////////////////////////////////////////////////////////////////
+    if (treeExists == false)
+    {
+        treeCounter++;
+    }
+
+    if (treeCounter % 100 == 0 && treeExists == false)
+     {
+        tree = new Tree();
+        TreePic1 = new QPixmap("Images/TREE_1.png");
+        TreePic2 = new QPixmap("Images/TREE_2.png");
+        TreeScaled1 = TreePic1->scaled( 80, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+        TreeScaled2 = TreePic2->scaled( 80, 70, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+        tree->setPixmap(TreeScaled1);
+        GameScene->addItem(tree);
+        tree->setPos(1000,410);
+        treeIsJumping = true;
+        treeJumpCounter = 0;
+
+        treeExists = true;
+        GameObjects.push_back(tree);
+        cout<<"Vector Size: "<<GameObjects.size()<<endl;
+     }
+/////////////////////////////////////////////////////////////////
+    if (devilExists == false)
+    {
+        devilCounter++;
+    }
+
+    if (devilCounter % 4000 == 0  && devilExists == false)
+    {
+            devil = new Devil();
+            DevilPic = new QPixmap("Images/DEVIL_1.png");
+            DevilPic2 = new QPixmap("Images/DEVIL_2.png");
+            DevilScaled = DevilPic->scaled( 90, 90, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+            DevilScaled2 = DevilPic2->scaled( 90, 90, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+            GameScene->addItem(devil);
+            devil->setPos(1200,410);
+
+            devilExists = true;
+            GameObjects.push_back(devil);
+            cout<<"Vector Size: "<<GameObjects.size()<<endl;
+
+
+            fireball = new Fireball();
+            FireballPic = new QPixmap("Images/FIREBALL_1.png");
+            FireballPic2 = new QPixmap("Images/FIREBALL_2.png");
+            FireballScaled = FireballPic->scaled( 45, 45, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+            FireballScaled2 = FireballPic2->scaled( 45, 45, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+
+
+            fireballExists = true;
+            shootFireball = false;
+           // GameObjects.push_back(fireball);
+           // cout<<"Vector Size: "<<GameObjects.size()<<endl;
+
+     }
+/////////////////////////////////////////////////
+    if (duckExists == false)
+        duckCounter++;
+
+    if (duckCounter % 5000 == 0 && duckExists == false)
+    {
+        duck = new Duck();
+        DuckPic = new QPixmap("Images/DUCK.png");
+        DuckScaled = DuckPic->scaled( 100, 90, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+        GameScene->addItem(duck);
+        DUCK_Y = 100;
+        duck->setPos(1500, DUCK_Y);
+        duck->setPixmap(DuckScaled);
+
+        duckExists = true;
+        GameObjects.push_back(duck);
+        cout<<"Vector Size: "<<GameObjects.size()<<endl;
+
+        book = new Book();
+        BookPic = new QPixmap("Images/POOP_1.png");
+        BookScaled = BookPic->scaled( 20, 20, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+        BookPic2 = new QPixmap("Images/POOP_2.png");
+        BookScaled2 = BookPic2->scaled( 20, 20, Qt::IgnoreAspectRatio, Qt::FastTransformation );
+
+        bookExists = true;
+        dropBook = false;
+
+    }
+
+}
 
 void MainWindow::pause()
 {
@@ -538,5 +885,5 @@ void MainWindow::exit()
 
 MainWindow::~MainWindow()
 {
-
+//remember to delete fireball and book
 }

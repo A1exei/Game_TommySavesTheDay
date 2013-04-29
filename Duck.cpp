@@ -3,7 +3,12 @@
 Duck::Duck()
 {
     GIFcounter = 0;
-    dropBook = false;
+    type_ = 6;
+}
+
+int Duck::ObjectType()
+{
+    return type_;
 }
 
 Duck::~Duck()

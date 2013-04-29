@@ -10,8 +10,12 @@ Tommy::Tommy()
 
 
     isJumping = false;
+    isFalling = false;
+    hurtCounter = 0;
     GIFcounter = 0;
     jumpCounter = 0;
+
+    type_ = 0;
 
 
 }
@@ -62,6 +66,10 @@ void Tommy::jump()
 
 }
 
+int Tommy::ObjectType()
+{
+    return type_;
+}
 
 Tommy::~Tommy()
 {

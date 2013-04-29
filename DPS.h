@@ -11,9 +11,10 @@ class DPS : public GameObject
     public:
         DPS();
         ~DPS();
-
         bool moving;
         int GIFcounter;
+        int type_;
+        int ObjectType();
 
 
 };

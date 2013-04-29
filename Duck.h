@@ -12,7 +12,8 @@ public:
     ~Duck();
     bool moving;
     int GIFcounter;
-    bool dropBook;
+    int type_;
+    int ObjectType();
 };
 
 #endif // DUCK_H

@@ -11,14 +11,15 @@ class Tommy : public GameObject
     public:
         Tommy();
         ~Tommy();
-        /*QPixmap* pic;
-        QPixmap* pic2;
-        QPixmap scaled;
-        QPixmap scaled2;   */
         bool moving;
+        bool flashing;
         bool isJumping;
+        bool isFalling;
         int GIFcounter;
+        int hurtCounter;
         int jumpCounter;
+        int type_;
+        int ObjectType();
 
 
     public slots:

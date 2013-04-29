@@ -1,19 +1,20 @@
-#ifndef DEVIL_H
-#define DEVIL_H
+#ifndef BOOK_H
+#define BOOK_H
 
 #include "GameObject.h"
 #include <iostream>
 using namespace std;
 
-class Devil:public GameObject
+class Book:public GameObject
 {
 public:
-    Devil();
-    ~Devil();
+    Book();
+    ~Book();
     bool moving;
     int GIFcounter;
     int type_;
     int ObjectType();
 };
 
-#endif // DEVIL_H
+
+#endif // BOOK_H
